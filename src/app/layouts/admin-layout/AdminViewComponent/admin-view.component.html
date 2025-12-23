@@ -1,0 +1,71 @@
+<div class="main-content">
+  <div class="container-fluid">
+    
+    <div class="card">
+        <div class="card-header card-header-info">
+            <h4 class="card-title">Filter Employees</h4>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                
+                <div class="col-md-4">
+                    <mat-form-field class="w-100">
+                        <mat-select placeholder="Filter By" [(ngModel)]="filterType" (selectionChange)="onFilterTypeChange()">
+                            <mat-option value="All">All Employees</mat-option>
+                            <mat-option value="Manager">By Manager</mat-option>
+                            <mat-option value="Project">By Project</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-4" *ngIf="filterType !== 'All'">
+                    <mat-form-field class="w-100">
+                        <mat-select [placeholder]="filterType === 'Manager' ? 'Select Manager' : 'Select Project'" [(ngModel)]="filterValue">
+                            <ng-container *ngIf="filterType === 'Manager'">
+                                <mat-option *ngFor="let m of managers" [value]="m.id">{{ m.name }}</mat-option>
+                            </ng-container>
+                            <ng-container *ngIf="filterType === 'Project'">
+                                <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-4">
+                    <button class="btn btn-info mr-2" (click)="applyFilter()">Apply Filter</button>
+                    <button class="btn btn-warning" (click)="downloadReport()">
+                        <i class="material-icons">cloud_download</i> Download Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="text-info">
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Project</th>
+                        <th>Manager</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let user of filteredUsers">
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ getProjectName(user.projectId) }}</td>
+                            <td>{{ getManagerName(user.managerId) }}</td>
+                        </tr>
+                        <tr *ngIf="filteredUsers.length === 0">
+                            <td colspan="4" class="text-center text-muted">No employees found matching the filter.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+  </div>
+</div>

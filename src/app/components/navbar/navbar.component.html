@@ -1,0 +1,73 @@
+<nav class="navbar navbar-expand-lg navbar-absolute fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-wrapper">
+          </div>
+
+        <div class="d-none d-md-flex justify-content-center align-items-center" *ngIf="isUserAdmin">
+            <div class="btn-group shadow-sm" role="group">
+                <button type="button" class="btn btn-sm" 
+                        [class.btn-primary]="currentView === 'employee'" 
+                        [class.btn-white]="currentView !== 'employee'"
+                        (click)="switchView('employee')">
+                    Employee
+                </button>
+                <button type="button" class="btn btn-sm" 
+                        [class.btn-primary]="currentView === 'manager'" 
+                        [class.btn-white]="currentView !== 'manager'"
+                        (click)="switchView('manager')">
+                    Manager
+                </button>
+                <button type="button" class="btn btn-sm" 
+                        [class.btn-primary]="currentView === 'admin'" 
+                        [class.btn-white]="currentView !== 'admin'"
+                        (click)="switchView('admin')">
+                    Admin
+                </button>
+            </div>
+        </div>
+
+        <button mat-raised-button class="navbar-toggler" type="button" (click)="sidebarToggle()">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navigation">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="javascript:void(0)" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="material-icons text-dark" style="font-size: 32px;">account_circle</i>
+                        <span class="d-lg-none d-md-block">Account</span>
+                    </a>
+                    
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile" style="min-width: 250px; padding: 15px;">
+                        
+                        <h6 class="dropdown-header" style="font-size: 16px; font-weight: bold; color: #333; text-transform: none;">
+                            {{ userProfile.name }}
+                        </h6>
+                        
+                        <div class="dropdown-divider"></div>
+                        
+                        <div class="dropdown-item-text" style="color: #555; font-size: 13px; line-height: 1.6;">
+                            <strong>Project:</strong> {{ userProfile.projectName }} <br>
+                            <span class="text-muted" style="font-size: 11px;">(ID: {{ userProfile.projectId }})</span>
+                        </div>
+                        
+                        <div class="dropdown-item-text" style="color: #555; font-size: 13px; margin-top: 5px;">
+                            <strong>Manager:</strong> {{ userProfile.managerName }}
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <div class="dropdown-item-text text-center" style="background: #f5f5f5; border-radius: 4px; padding: 8px; margin-top: 5px; font-weight: 500; color: #555;">
+                            {{ userProfile.name }} - {{ userProfile.empId }}
+                        </div>
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
