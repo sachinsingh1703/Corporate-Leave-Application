@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AdminLayoutRoutes } from './admin-layout.routing';
+import { HttpClientModule } from '@angular/common/http';
 
 // Components
 import { DashboardComponent } from '../../dashboard/dashboard.component';
@@ -48,7 +49,8 @@ import { MatRadioModule } from '@angular/material/radio'; // <--- 1. ADD THIS IM
     MatRadioModule,
     MatCheckboxModule,
     MatIconModule,
-    MatMenuModule,// <--- 2. ADD THIS TO THE IMPORTS ARRAY
+    MatMenuModule,
+    HttpClientModule,// <--- 2. ADD THIS TO THE IMPORTS ARRAY
   ],
   declarations: [
     DashboardComponent,

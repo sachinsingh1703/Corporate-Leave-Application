@@ -1,6 +1,52 @@
 <div class="main-content">
   <div class="container-fluid">
      
+      <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-warning">
+                    <h4 class="card-title">Auto-Upload Timesheet</h4>
+                    <p class="card-category">Upload a screenshot of your schedule. AI will detect absences.</p>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="timesheetInput" class="btn btn-default btn-round mat-raised-button">
+                                    <i class="material-icons">attach_file</i> Choose Screenshot
+                                </label>
+                                <input type="file" id="timesheetInput" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+                                
+                                <span class="ml-3 font-weight-bold" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+                                <span class="ml-3 text-muted" *ngIf="!selectedFile">No file selected</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 text-right">
+                            <button mat-raised-button class="btn btn-warning" 
+                                    (click)="uploadTimesheet()" 
+                                    [disabled]="!selectedFile || isScanning">
+                                <span *ngIf="isScanning" class="spinner-border spinner-border-sm mr-1"></span>
+                                <i class="material-icons" *ngIf="!isScanning">cloud_upload</i> 
+                                {{ isScanning ? 'Processing...' : 'Scan & Update' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3" *ngIf="scanMessage">
+                        <div class="col-md-12">
+                            <div class="alert" [ngClass]="scanMessage.includes('Error') ? 'alert-danger' : 'alert-success'" style="padding: 10px 15px; border-radius: 4px;">
+                                <span style="font-size: 14px; font-weight: 500;">{{ scanMessage }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+      </div>
+
       <div class="row pt-3">
           <div class="col-md-12">
               <app-calendar [targetEmployee]="currentUser"></app-calendar>

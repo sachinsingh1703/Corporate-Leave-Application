@@ -4,7 +4,7 @@
     <div class="row mb-4 align-items-center">
         <div class="col-md-5">
             <div class="input-group no-border" style="max-width: 400px;">
-                <input type="text" class="form-control" placeholder="Search employees..." 
+                <input type="text" class="form-control" placeholder="Search (Name, ID, Project...)" 
                        [(ngModel)]="searchText" (keyup)="onSearch()">
                 <button mat-raised-button class="btn btn-white btn-round btn-just-icon" (click)="onSearch()">
                     <i class="material-icons">search</i>
@@ -32,8 +32,9 @@
                 <div class="card-body table-responsive">
                     <table class="table table-hover">
                         <thead class="text-primary">
-                            <th>Emp Code</th>
+                            <th>Emp ID</th>
                             <th>Name</th>
+                            <th>Role</th>
                             <th>Project</th>
                             <th>Manager</th>
                             <th class="text-right">Actions</th>
@@ -42,21 +43,30 @@
                             <tr *ngFor="let user of displayedUsers">
                                 <td>{{ user.empCode }}</td>
                                 <td style="font-weight: 500;">{{ user.name }}</td>
+                                <td>
+                                    <span class="badge" [ngClass]="{
+                                        'badge-danger': user.role === 'admin',
+                                        'badge-warning': user.role === 'manager',
+                                        'badge-info': user.role === 'employee'
+                                    }">
+                                        {{ user.role | titlecase }}
+                                    </span>
+                                </td>
                                 <td>{{ getProjectName(user.projectId) }}</td>
                                 <td>{{ getManagerName(user.managerId) }}</td>
                                 <td class="td-actions text-right">
                                     <button mat-raised-button class="btn btn-primary btn-link btn-sm btn-just-icon" 
                                             (click)="editUser(user)" matTooltip="Edit">
-                                        <i class="material-icons">edit</i>
+                                            <i class="material-icons">edit</i>
                                     </button>
                                     <button mat-raised-button class="btn btn-danger btn-link btn-sm btn-just-icon" 
                                             (click)="deleteUser(user)" matTooltip="Delete">
-                                        <i class="material-icons">close</i>
+                                            <i class="material-icons">close</i>
                                     </button>
                                 </td>
                             </tr>
                             <tr *ngIf="displayedUsers.length === 0">
-                                <td colspan="5" class="text-center text-muted py-3">No employees found.</td>
+                                <td colspan="6" class="text-center text-muted py-3">No employees found.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -76,7 +86,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <mat-form-field class="w-100">
-                                <input matInput placeholder="Emp Code *" [(ngModel)]="formData.empCode" name="code" required>
+                                <input matInput placeholder="Emp ID *" [(ngModel)]="formData.empCode" name="code" required>
                             </mat-form-field>
                         </div>
                         <div class="col-md-4">
@@ -108,10 +118,11 @@
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <label class="d-block text-muted mb-2" style="font-size: 11px; font-weight: 600; text-transform: uppercase;">Role Assignment</label>
-                            <div class="d-flex align-items-center">
-                                <mat-checkbox color="primary" [(ngModel)]="formData.isManager" name="chkManager" class="mr-4">Is Manager</mat-checkbox>
-                                <mat-checkbox color="warn" [(ngModel)]="formData.isAdmin" name="chkAdmin">Is Admin</mat-checkbox>
-                            </div>
+                            <mat-radio-group [(ngModel)]="formData.role" name="roleGroup" class="d-flex align-items-center">
+                                <mat-radio-button value="employee" class="mr-4 text-info">Employee</mat-radio-button>
+                                <mat-radio-button value="manager" class="mr-4 text-warning">Manager</mat-radio-button>
+                                <mat-radio-button value="admin" class="text-danger">Admin</mat-radio-button>
+                            </mat-radio-group>
                         </div>
                     </div>
 
@@ -127,10 +138,10 @@
                         </div>
                         <div class="col-md-6">
                             <mat-form-field class="w-100">
-                                <mat-label>Assign Project</mat-label>
+                                <mat-label>Project ID</mat-label>
                                 <mat-select [(ngModel)]="formData.projectId" name="prj" panelClass="modal-select-panel">
                                     <mat-option [value]="null">-- None --</mat-option>
-                                    <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</mat-option>
+                                    <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.name }} (ID: {{p.id}})</mat-option>
                                 </mat-select>
                             </mat-form-field>
                         </div>
@@ -197,5 +208,6 @@
 .modal-title { margin: 0; font-weight: 300; font-size: 20px; }
 .modal-subtitle { margin: 0; opacity: 0.8; font-size: 13px; margin-top: 5px; }
 ::ng-deep .cdk-overlay-container { z-index: 1050 !important; }
-.mat-checkbox { margin-right: 20px; }
+/* Radio Button Spacing */
+.mat-radio-button { margin-right: 20px; }
 </style>

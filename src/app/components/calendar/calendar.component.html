@@ -1,13 +1,9 @@
 <div class="cal-wrapper">
   
   <div class="cal-header">
-    <button mat-icon-button (click)="changeMonth(-1)">
-      <mat-icon>chevron_left</mat-icon>
-    </button>
+    <button mat-icon-button (click)="changeMonth(-1)"><mat-icon>chevron_left</mat-icon></button>
     <span class="cal-month-label">{{ displayMonth }}</span>
-    <button mat-icon-button (click)="changeMonth(1)">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
+    <button mat-icon-button (click)="changeMonth(1)"><mat-icon>chevron_right</mat-icon></button>
   </div>
 
   <div class="cal-grid">
@@ -16,9 +12,7 @@
     <div class="cal-cell" *ngFor="let day of calendarDays" 
          [ngClass]="{'cal-empty': !day.date, 'cal-has-data': day.date}">
       
-      <div class="cal-date-number" *ngIf="day.date">
-          {{ day.date }}
-      </div>
+      <div class="cal-date-number" *ngIf="day.date">{{ day.date }}</div>
 
       <button mat-icon-button [matMenuTriggerFor]="cellMenu" class="cal-menu-btn" 
               *ngIf="day.date" (click)="stopProp($event)">
@@ -32,13 +26,17 @@
           <button mat-menu-item (click)="applyLeaveFromCalendar(day.fullDate, 'Half Day')">
               <mat-icon>schedule</mat-icon> Half Day Leave
           </button>
-          <button mat-menu-item (click)="applyLeaveFromCalendar(day.fullDate, 'Optional Holiday')">
-              <mat-icon>celebration</mat-icon> Optional Holiday
+          <button mat-menu-item (click)="applyLeaveFromCalendar(day.fullDate, 'Holiday')">
+              <mat-icon>celebration</mat-icon> Holiday
+          </button>
+
+          <button mat-menu-item (click)="resetLeave(day.fullDate)" *ngIf="day.status && !day.status.includes('Present') && day.status !== 'Weekend'">
+              <mat-icon color="warn">restart_alt</mat-icon> <span class="text-danger">Reset to Default</span>
           </button>
       </mat-menu>
 
       <div class="cal-status-badge" *ngIf="day.status" [ngClass]="day.cssClass">
-          {{ day.status }}
+          {{ formatStatus(day.status) }}
       </div>
       
     </div>

@@ -34,6 +34,25 @@ export class CalendarComponent implements OnInit, OnChanges {
     this.generateCalendar();
   }
 
+  // ============================================================
+  // 1. HELPER: FORMAT STATUS TEXT (Clean up for Badge)
+  // ============================================================
+  formatStatus(status: string): string {
+    if (!status) return '';
+    // Remove "Leave:" prefix if present
+    if (status.startsWith('Leave:')) {
+        return status.replace('Leave:', '').trim(); 
+    }
+    // Handle Holiday Text
+    if (status.startsWith('Holiday')) {
+        return 'Holiday'; 
+    }
+    return status;
+  }
+
+  // ============================================================
+  // 2. GENERATE CALENDAR GRID
+  // ============================================================
   generateCalendar() {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
@@ -45,12 +64,12 @@ export class CalendarComponent implements OnInit, OnChanges {
 
     this.calendarDays = [];
 
-    // 1. Empty cells
+    // A. Empty cells (before 1st of month)
     for (let i = 0; i < firstDay; i++) {
       this.calendarDays.push({ date: null });
     }
 
-    // 2. Days with Data
+    // B. Days with Data
     const userToCheck = this.targetEmployee || 'Dakota Rice';
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -74,7 +93,7 @@ export class CalendarComponent implements OnInit, OnChanges {
       });
     }
 
-    // 3. Fill Remaining
+    // C. Fill Remaining cells
     const totalCells = this.calendarDays.length;
     const remaining = 7 - (totalCells % 7);
     if (remaining < 7) {
@@ -85,7 +104,7 @@ export class CalendarComponent implements OnInit, OnChanges {
   }
 
   // ============================================================
-  // UPDATED: ALLOW WHOLE CURRENT MONTH + NEXT MONTH
+  // 3. APPLY LEAVE (Current + Next Month Logic)
   // ============================================================
   applyLeaveFromCalendar(dateKey: string, type: string) {
       if(!dateKey) return;
@@ -93,25 +112,21 @@ export class CalendarComponent implements OnInit, OnChanges {
       const userToCheck = this.targetEmployee || 'Dakota Rice';
       const selectedDate = new Date(dateKey);
       
-      // 1. Get Base Reference Dates
       const today = new Date();
       
-      // Start of Current Month (e.g., Dec 1, 2025)
+      // Start of Current Month
       const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
       
-      // End of Next Month (e.g., Jan 31, 2026)
+      // End of Next Month
       const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
 
-      // --- VALIDATION RULES ---
-      
-      // Rule A: Allow anything from the 1st of this month onwards
-      // (Blocks Nov 30 and earlier, but allows Dec 2 even if today is Dec 22)
+      // Rule A: Prevent past months
       if(selectedDate < startOfCurrentMonth) {
           alert("Cannot apply leave for past months.");
           return;
       }
 
-      // Rule B: Cannot apply beyond next month
+      // Rule B: Prevent far future (beyond next month)
       if(selectedDate > endOfNextMonth) {
           alert("You can only apply for leaves in the current or upcoming month.");
           return;
@@ -131,6 +146,30 @@ export class CalendarComponent implements OnInit, OnChanges {
 
           this.attendanceService.applyLeave(dateKey, type, reason, userToCheck);
           alert('Leave Request Applied Successfully!');
+      }
+  }
+
+  // ============================================================
+  // 4. RESET / CANCEL LEAVE (Only for Current & Future)
+  // ============================================================
+  resetLeave(dateKey: string) {
+      if(!dateKey) return;
+
+      const selectedDate = new Date(dateKey);
+      const today = new Date();
+      
+      // Start of Current Month
+      const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      // VALIDATION: Prevent editing past months
+      if (selectedDate < startOfCurrentMonth) {
+          alert("Cannot edit attendance for past months.");
+          return;
+      }
+
+      if (confirm(`Are you sure you want to cancel this leave for ${dateKey}?`)) {
+          this.attendanceService.withdrawLeave(dateKey);
+          alert('Leave cancelled. Status reset to default.');
       }
   }
 

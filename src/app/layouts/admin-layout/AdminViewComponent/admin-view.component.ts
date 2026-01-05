@@ -15,9 +15,9 @@ export class AdminViewComponent implements OnInit {
   managers: any[] = [];
 
   // 2. FILTER STATE
-  filterType: string = 'All'; 
-  filterValue: any = null;
-  filterOptions: any[] = []; 
+  // Fixed to 'Project' as per your requirement
+  filterType: string = 'Project'; 
+  filterValue: any = null; // Stores selected Project ID
 
   constructor(private service: AttendanceService) { }
 
@@ -32,38 +32,24 @@ export class AdminViewComponent implements OnInit {
     this.allUsers = this.service.getEmployees();
     this.projects = this.service.getProjects();
     this.managers = this.service.getManagers();
-    this.applyFilter(); 
+    
+    // Initial Load: Show all users by default until a filter is applied
+    this.filteredUsers = [...this.allUsers]; 
   }
 
-  // 3. EVENT HANDLERS
-  onFilterTypeChange() {
-      this.filterValue = null; 
-      if (this.filterType === 'Project') {
-          this.filterOptions = this.projects;
-      } else if (this.filterType === 'Manager') {
-          this.filterOptions = this.managers;
-      } else {
-          this.filterOptions = [];
-          this.applyFilter(); 
-      }
-  }
-
+  // 3. FILTER LOGIC
   applyFilter() {
-      if (this.filterType === 'All') {
-          this.filteredUsers = [...this.allUsers];
-      } 
-      else if (this.filterType === 'Project' && this.filterValue) {
+      // Logic simplified: We only check for Project ID now
+      if (this.filterValue) {
+          // Filter by the selected Project ID
           this.filteredUsers = this.allUsers.filter(u => u.projectId == this.filterValue);
-      } 
-      else if (this.filterType === 'Manager' && this.filterValue) {
-          this.filteredUsers = this.allUsers.filter(u => u.managerId == this.filterValue);
-      }
-      else {
+      } else {
+          // If no project selected, show all users (or you can make this [] to show nothing)
           this.filteredUsers = [...this.allUsers];
       }
   }
 
-  // 4. REPORT GENERATION (UPDATED CSV FORMAT)
+  // 4. REPORT GENERATION
   downloadReport() {
     const allLeaves = this.service.getAllRequests();
     
@@ -82,13 +68,12 @@ export class AdminViewComponent implements OnInit {
 
     // 3. Iterate through every day of the month
     for (let day = 1; day <= daysInMonth; day++) {
-        // Format date as YYYY-MM-DD to match leave data
+        // Format date as YYYY-MM-DD
         const dateKey = `${year}-${month + 1 < 10 ? '0'+(month+1) : month+1}-${day < 10 ? '0'+day : day}`;
         
         // Find leaves for this specific date
         const leavesOnThisDay = relevantLeaves.filter(l => l.date === dateKey);
 
-        // Update max columns needed
         if (leavesOnThisDay.length > maxCols) {
             maxCols = leavesOnThisDay.length;
         }
@@ -109,7 +94,7 @@ export class AdminViewComponent implements OnInit {
         csvDataRows.push(row);
     }
 
-    // 4. Create Header Row dynamically based on maxCols
+    // 4. Create Header Row
     let headerRow = ['Date'];
     for (let i = 1; i <= maxCols; i++) {
         headerRow.push(`Employee ${i}`);
@@ -122,7 +107,7 @@ export class AdminViewComponent implements OnInit {
     
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Monthly_Attendance_${this.filterType}_${year}-${month+1}.csv`;
+    a.download = `Attendance_Report_${year}-${month+1}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   }

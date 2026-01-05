@@ -8,35 +8,21 @@
         <div class="card-body">
             <div class="row align-items-center">
                 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <mat-form-field class="w-100">
-                        <mat-select placeholder="Filter By" [(ngModel)]="filterType" (selectionChange)="onFilterTypeChange()">
-                            <mat-option value="All">All Employees</mat-option>
-                            <mat-option value="Manager">By Manager</mat-option>
-                            <mat-option value="Project">By Project</mat-option>
+                        <mat-select placeholder="Select Project Name" [(ngModel)]="filterValue">
+                            <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>
 
-                <div class="col-md-4" *ngIf="filterType !== 'All'">
-                    <mat-form-field class="w-100">
-                        <mat-select [placeholder]="filterType === 'Manager' ? 'Select Manager' : 'Select Project'" [(ngModel)]="filterValue">
-                            <ng-container *ngIf="filterType === 'Manager'">
-                                <mat-option *ngFor="let m of managers" [value]="m.id">{{ m.name }}</mat-option>
-                            </ng-container>
-                            <ng-container *ngIf="filterType === 'Project'">
-                                <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</mat-option>
-                            </ng-container>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-
-                <div class="col-md-4">
+                <div class="col-md-6 text-right">
                     <button class="btn btn-info mr-2" (click)="applyFilter()">Apply Filter</button>
                     <button class="btn btn-warning" (click)="downloadReport()">
                         <i class="material-icons">cloud_download</i> Download Report
                     </button>
                 </div>
+
             </div>
         </div>
     </div>

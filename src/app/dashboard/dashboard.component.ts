@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AttendanceService, Employee, Project } from '../services/attendance.service';
+import { TimesheetService } from '../services/timesheet.service'; // <--- Import the new Service
 
 @Component({
   selector: 'app-dashboard',
@@ -8,8 +9,9 @@ import { AttendanceService, Employee, Project } from '../services/attendance.ser
 })
 export class DashboardComponent implements OnInit {
 
-  // REMOVED: stats object
-
+  // =============================================
+  // 1. EXISTING DASHBOARD DATA
+  // =============================================
   userProfile = {
       name: '',
       projectId: '',
@@ -20,10 +22,22 @@ export class DashboardComponent implements OnInit {
   myLeaves: any[] = [];
   currentUser: string = 'Dakota Rice'; 
 
-  constructor(private service: AttendanceService) { }
+  // =============================================
+  // 2. NEW: TIMESHEET SCANNING VARIABLES
+  // =============================================
+  selectedFile: File | null = null;
+  isScanning: boolean = false;
+  scanMessage: string = '';
+
+  constructor(
+      private service: AttendanceService, 
+      private timesheetService: TimesheetService // <--- Inject the Service
+  ) { }
 
   ngOnInit() {
     this.loadDashboardData();
+    
+    // Subscribe to data changes to refresh leaves after a scan
     this.service.dataChanged$.subscribe(() => {
         this.loadDashboardData();
     });
@@ -51,10 +65,11 @@ export class DashboardComponent implements OnInit {
             managerName: mgr ? mgr.name : 'Unassigned'
         };
     }
-    
-    // REMOVED: Call to calculateLeaveStats()
   }
 
+  // =============================================
+  // 3. EXISTING: LEAVE WITHDRAWAL LOGIC
+  // =============================================
   withdrawLeave(leave: any) {
     if (this.canWithdraw(leave.date)) {
         if(confirm(`Are you sure you want to withdraw your leave on ${leave.date}?`)) {
@@ -71,5 +86,41 @@ export class DashboardComponent implements OnInit {
     const diffTime = leaveDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays > 15;
+  }
+
+  // =============================================
+  // 4. NEW: TIMESHEET UPLOAD LOGIC
+  // =============================================
+  
+  onFileSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+        this.selectedFile = event.target.files[0];
+        this.scanMessage = ''; // Clear previous messages
+    }
+  }
+
+  uploadTimesheet() {
+    if (!this.selectedFile) return;
+
+    this.isScanning = true;
+    this.scanMessage = 'Scanning image with Gemini AI... please wait...';
+
+    // Call the backend via TimesheetService
+    this.timesheetService.uploadTimesheet(this.selectedFile, this.currentUser)
+      .subscribe(
+        (response: string) => {
+          this.isScanning = false;
+          this.scanMessage = response; // Display success message from Backend
+          this.selectedFile = null;    // Reset file input
+          
+          // Refresh data so the new leaves appear in the list immediately
+          this.service.dataChanged$.next(true);
+        },
+        (error: any) => {
+          this.isScanning = false;
+          console.error(error);
+          this.scanMessage = 'Error: ' + (error.error || 'Failed to connect to server.');
+        }
+      );
   }
 }
