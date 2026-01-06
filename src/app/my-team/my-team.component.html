@@ -8,19 +8,16 @@
                     <div class="nav-tabs-navigation">
                         <div class="nav-tabs-wrapper">
                             <ul class="nav nav-tabs" data-tabs="tabs">
-                                
                                 <li class="nav-item">
                                     <a class="nav-link tab-purple" [class.active]="activeTab === 'calendar'" (click)="switchTab('calendar')" href="javascript:void(0)">
                                         <i class="material-icons">calendar_month</i> Team Leave Calendar
                                     </a>
                                 </li>
-                                
                                 <li class="nav-item">
                                     <a class="nav-link tab-green" [class.active]="activeTab === 'team'" (click)="switchTab('team')" href="javascript:void(0)">
                                         <i class="material-icons">people</i> View Team
                                     </a>
                                 </li>
-
                             </ul>
                         </div>
                     </div>
@@ -40,10 +37,15 @@
               <div class="card-body">
                   <div class="row mb-3 align-items-center">
                       <div class="col-md-6 text-left">
-                        <button class="btn btn-primary btn-sm" (click)="downloadTeamReport()">
+                        <button class="btn btn-primary btn-sm mr-2" (click)="downloadTeamReport()">
                             <i class="material-icons">cloud_download</i> CSV Report
                         </button>
+                        
+                        <button class="btn btn-info btn-sm" (click)="sendReportToEmail()">
+                            <i class="material-icons">email</i> Send Report
+                        </button>
                       </div>
+                      
                       <div class="col-md-6 text-right">
                           <div class="d-inline-flex align-items-center" style="background: #eee; padding: 5px 15px; border-radius: 20px;">
                               <button class="btn btn-link btn-sm btn-primary p-0" (click)="changeTeamCalendarMonth(-1)" style="min-width: 30px;">
@@ -116,7 +118,7 @@
           <app-calendar [targetEmployee]="selectedEmployee.name"></app-calendar>
       </div>
 
-       <div class="modal-overlay" *ngIf="showEditEmployeeModal">
+      <div class="modal-overlay" *ngIf="showEditEmployeeModal">
            <div class="card modal-card">
                <div class="card-header card-header-success">
                    <h4 class="card-title">Edit Employee</h4>
@@ -189,17 +191,9 @@
 .nav-tabs .nav-link i { vertical-align: middle; margin-right: 5px; }
 
 /* --- PURPLE TAB (Calendar) --- */
-/* Added !important to FORCE visibility */
-.nav-link.tab-purple { 
-    color: #9c27b0 !important; 
-}
-.nav-link.tab-purple i {
-    color: #9c27b0 !important;
-}
-
-.nav-link.tab-purple:hover { 
-    background-color: #f3e5f5 !important; 
-}
+.nav-link.tab-purple { color: #9c27b0 !important; }
+.nav-link.tab-purple i { color: #9c27b0 !important; }
+.nav-link.tab-purple:hover { background-color: #f3e5f5 !important; }
 
 .nav-link.tab-purple.active { 
     color: #fff !important;           
@@ -208,22 +202,12 @@
     box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 
                 0 7px 10px -5px rgba(156, 39, 176, 0.4) !important;
 }
-.nav-link.tab-purple.active i {
-    color: #fff !important;
-}
+.nav-link.tab-purple.active i { color: #fff !important; }
 
 /* --- GREEN TAB (View Team) --- */
-/* Added !important to FORCE visibility */
-.nav-link.tab-green { 
-    color: #4caf50 !important; 
-}
-.nav-link.tab-green i {
-    color: #4caf50 !important;
-}
-
-.nav-link.tab-green:hover { 
-    background-color: #e8f5e9 !important; 
-}
+.nav-link.tab-green { color: #4caf50 !important; }
+.nav-link.tab-green i { color: #4caf50 !important; }
+.nav-link.tab-green:hover { background-color: #e8f5e9 !important; }
 
 .nav-link.tab-green.active { 
     color: #fff !important;           
@@ -232,9 +216,7 @@
     box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 
                 0 7px 10px -5px rgba(76, 175, 80, 0.4) !important;
 }
-.nav-link.tab-green.active i {
-    color: #fff !important;
-}
+.nav-link.tab-green.active i { color: #fff !important; }
 
 
 /* ==================================

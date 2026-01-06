@@ -222,4 +222,15 @@ export class MyTeamComponent implements OnInit {
     const month = this.statsDate.getMonth();
     this.attendanceStats = this.service.getMonthlyStats(this.selectedEmployee.name, year, month);
   }
+
+  // Inside MyTeamComponent class
+  sendReportToEmail() {
+      const userEmail = this.service.getCurrentUserEmail(); // You need to implement this in service
+      if (userEmail) {
+          // Logic to trigger backend email service
+          alert(`Report for ${this.teamCalendarMonthLabel} has been sent to ${userEmail}.`);
+      } else {
+          alert('Could not find your email address.');
+      }
+  }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 // 1. INTERFACES
 export interface Employee {
@@ -8,7 +8,7 @@ export interface Employee {
   name: string;
   firstName: string;
   lastName: string;
-  role: 'admin' | 'manager' | 'employee'; // <--- REQUIRED for Permission Logic
+  role: 'admin' | 'manager' | 'employee'; 
   managerId: number | null;
   projectId: string | number | null;
   projectMailId: string;
@@ -38,7 +38,7 @@ export interface LeaveRequest {
 export class AttendanceService {
   
   // ============================================================
-  // A. VIEW STATE MANAGEMENT (For Admin Switcher)
+  // A. VIEW STATE MANAGEMENT
   // ============================================================
   private viewRoleSubject = new BehaviorSubject<string>('admin');
   viewRole$ = this.viewRoleSubject.asObservable();
@@ -60,7 +60,7 @@ export class AttendanceService {
   ];
 
   employees: Employee[] = [
-    // 1. Manager (Added to employees list so he can log in)
+    // 1. Manager 
     { 
       id: 1, empCode: 'MGR001', firstName: 'Mike', lastName: 'John', name: 'Mike John', 
       role: 'manager', managerId: null, projectId: 101, projectMailId: 'mike@company.com', 
@@ -98,39 +98,34 @@ export class AttendanceService {
   adminEvents: any[] = []; 
   private attendanceData: any = {};
   
-  // LEAVE REQUESTS (Updated interface)
   private leaveRequests: LeaveRequest[] = [
     { id: 1, date: '2025-12-05', type: 'Full Day', reason: 'Sick Leave', employeeName: 'Dakota Rice', managerId: 1, status: 'Approved' },
     { id: 2, date: '2025-12-05', type: 'Half Day', reason: 'Bank Work', employeeName: 'Minerva Hooper', managerId: 1, status: 'Approved' },
     { id: 3, date: '2025-12-05', type: 'Optional Holiday', reason: 'Personal Festival', employeeName: 'Sage Rodriguez', managerId: 2, status: 'Approved' },
     { id: 4, date: '2025-12-24', type: 'Full Day', reason: 'Christmas Eve Prep', employeeName: 'Dakota Rice', managerId: 1, status: 'Approved' },
-    { id: 5, date: '2026-01-14', type: 'Optional Holiday', reason: 'Makar Sankranti', employeeName: 'Dakota Rice', managerId: 1, status: 'Pending' } // Pending for demo
+    { id: 5, date: '2026-01-14', type: 'Optional Holiday', reason: 'Makar Sankranti', employeeName: 'Dakota Rice', managerId: 1, status: 'Pending' }
   ];
 
   constructor() { }
 
   // ============================================================
-  // C. CORE METHODS (VIEW & GETTERS)
+  // C. CORE METHODS
   // ============================================================
-
-  // 1. SWITCH VIEW (For Admin Buttons)
   switchToView(role: string) {
     this.viewRoleSubject.next(role);
   }
 
   getProjects() { return this.projects; }
-  getManagers() { return this.managers; } // Returns simple manager list
-  getEmployees() { return this.employees; } // Returns full employee objects
+  getManagers() { return this.managers; }
+  getEmployees() { return this.employees; }
   
   getTeamByManager(managerId: number) { 
     return this.employees.filter(e => e.managerId == managerId); 
   }
 
   // ============================================================
-  // D. LEAVE & NOTIFICATION METHODS (CRITICAL FOR UI)
+  // D. LEAVE & HOLIDAY METHODS
   // ============================================================
-
-  // Used by Manager Dashboard to see pending requests
   getManagerNotifications(managerId: number) {
     return this.leaveRequests.filter(r => r.managerId == managerId && r.status === 'Pending');
   }
@@ -144,7 +139,6 @@ export class AttendanceService {
       return `${used}/3`;
   }
 
-  // 2. ADD THESE IF MISSING (Calendar often needs them too)
   getUpcomingHolidays() { return this.getMandatoryHolidays(); }
   
   getMandatoryHolidays() {
@@ -162,7 +156,6 @@ export class AttendanceService {
     ];
   }
 
-  // Used by Team Calendar
   getTeamLeavesForMonth(managerId: number, year: number, month: number) {
     return this.leaveRequests.filter(req => {
       const d = new Date(req.date);
@@ -187,7 +180,7 @@ export class AttendanceService {
   getAllRequests() { return this.leaveRequests; }
 
   // ============================================================
-  // E. CRUD OPERATIONS (EMPLOYEES & PROJECTS)
+  // E. CRUD OPERATIONS
   // ============================================================
   addEmployee(empData: any) {
     const newEmp: Employee = {
@@ -196,7 +189,7 @@ export class AttendanceService {
       firstName: empData.firstName,
       lastName: empData.lastName,
       name: `${empData.firstName} ${empData.lastName}`,
-      role: empData.role || 'employee', // Default to employee
+      role: empData.role || 'employee',
       managerId: empData.managerId,
       projectId: empData.projectId,
       projectMailId: empData.projectMailId,
@@ -246,7 +239,6 @@ export class AttendanceService {
   // ============================================================
   // F. ATTENDANCE LOGIC
   // ============================================================
-  
   addAdminEvent(event: any) {
       this.adminEvents.push(event);
       this.dataChanged$.next(true);
@@ -289,7 +281,6 @@ export class AttendanceService {
   }
 
   updateAttendanceStatus(employeeName: string, date: string, status: string, type: string) {
-    // 1. Clear existing leaves for that day to allow override
     this.leaveRequests = this.leaveRequests.filter(r => !(r.employeeName === employeeName && r.date === date));
 
     if (status === 'Present') {
@@ -308,7 +299,18 @@ export class AttendanceService {
   }
 
   // ============================================================
-  // G. STATS & REPORTING
+  // G. HELPER METHODS (User Info)
+  // ============================================================
+  
+  // Gets the email of the currently simulated logged-in user
+  getCurrentUserEmail(): string {
+    // For this mock app, we assume 'Dakota Rice' is the logged-in user.
+    const currentUser = this.employees.find(e => e.name === 'Dakota Rice');
+    return currentUser ? currentUser.email : 'dakota@test.com';
+  }
+
+  // ============================================================
+  // H. STATS & REPORTING
   // ============================================================
 
   getMonthlyStats(employeeName: string, year: number, month: number) {
@@ -320,7 +322,6 @@ export class AttendanceService {
     if (year === today.getFullYear() && month === today.getMonth()) {
         limitDate = today.getDate(); 
     } else if (new Date(year, month, 1) > today) {
-        // Future month
         return { present: 0, absent: 0, leaves: this.countLeavesInMonth(employeeName, year, month) };
     }
 
@@ -328,7 +329,7 @@ export class AttendanceService {
     for (let i = 1; i <= limitDate; i++) {
         const currentDate = new Date(year, month, i);
         const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) continue; // Skip Weekends
+        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
 
         const dateKey = `${year}-${month + 1 < 10 ? '0' + (month+1) : month+1}-${i < 10 ? '0' + i : i}`;
         const status = this.getStatus(dateKey, employeeName);
@@ -352,7 +353,7 @@ export class AttendanceService {
   }
 
   // ============================================================
-  // H. APPLY / WITHDRAW
+  // I. APPLY / WITHDRAW
   // ============================================================
 
   applyLeave(dateKey: string, type: string, reason: string, employeeName: string = 'Dakota Rice') {
@@ -364,10 +365,9 @@ export class AttendanceService {
       reason: reason,
       employeeName: employeeName,
       managerId: emp ? (emp.managerId || 1) : 1, 
-      status: 'Approved' // Auto-approve for demo
+      status: 'Approved'
     };
     
-    // Remove duplicates if any
     this.leaveRequests = this.leaveRequests.filter(r => !(r.date === dateKey && r.employeeName === employeeName));
     this.leaveRequests.push(newRequest);
     this.dataChanged$.next(true);
@@ -382,7 +382,7 @@ export class AttendanceService {
   }
 
   // ============================================================
-  // I. CSV REPORT
+  // J. CSV REPORT
   // ============================================================
   downloadReport(employeeId: number, employeeName: string, startDate?: string, endDate?: string) {
     let csvContent = "Date,Status,Type,Reason\n";
